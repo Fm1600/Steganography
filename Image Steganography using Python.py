@@ -7,16 +7,6 @@ import binascii
 
 
 ################################Logic for Binary to String conversion.#################
-# Defining BinarytoDecimal() function
-def BinaryToDecimal(binary):
-     
-    # Using int function to convert to
-    # string  
-    string = int(binary, 2)
-    return string
-# Driver's code
-# initializing binary data
-# print binary data
 def BinarytoString(bin_data):
 
 # initializing a empty string for
@@ -33,7 +23,7 @@ def BinarytoString(bin_data):
       
     # passing temp_data in BinarytoDecimal() function
     # to get decimal value of corresponding temp_data
-        decimal_data = BinaryToDecimal(temp_data)
+        decimal_data = int(temp_data,2)
       
     # Decoding the decimal value returned by BinarytoDecimal() function, using chr()
     # function which return the string corresponding
@@ -42,11 +32,11 @@ def BinarytoString(bin_data):
         str_data = str_data + chr(decimal_data)
         if(str_data[-4:]=='===='):
             break
-# printing the result
+# returning the result
     return(str_data[:-4])
 ##############################  End of Binary to ascii Method   ##########################
 
-##############################CONVERT TEXT INPUT TO BINARY############################
+##############################  CONVERT TEXT INPUT TO BINARY    ############################
 def TexttoBin(test_str):
     
     # using join() + bytearray() + format()
@@ -61,8 +51,8 @@ def encoding(image_name,data):
     i=0
     with Image.open(image_name) as img:
 
-        if img.format not in ('BMP','PNG'):
-            print('Only Lossless compresssion Images are supported, Please select BMP or PNG extension Images')
+        if img.format not in ('BMP','PNG','TIFF'):
+            print('Only Lossless compresssion Images are supported, Please select BMP or PNG or TIFF extension Images')
             exit()
          #Checking max characters possible to encode
         if(img.mode=='RGB'):
@@ -106,7 +96,7 @@ def decoding(image_name):
     extracted_bin = []
     
     with Image.open(image_name) as img:
-        if img.format not in ('BMP','PNG'):
+        if img.format not in ('BMP','PNG','TIFF'):
            print('Only Lossless compresssion Images are supported, Please select BMP or PNG extension Images')
            exit()
         print("--------------------Decoding the Image--------------------")
