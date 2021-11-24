@@ -24,8 +24,11 @@ def BinarytoString(bin_data):
         str_data = str_data + chr(decimal_data)
         if(str_data[-4:]=='===='):
             break
-# returning the result
-    return(str_data[:-4])
+    if(str_data.find('====')== -1):
+        print('End string not found, either the image is not encoded with any data or different steg tool was used for encoding!!')
+        exit()
+    else:
+        return(str_data[:-4])
 ##############################  End of Binary to ascii Method   ##########################
 
 ##############################  CONVERT TEXT INPUT TO BINARY    ############################
