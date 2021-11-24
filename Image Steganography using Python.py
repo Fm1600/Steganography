@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 from PIL import UnidentifiedImageError
 
-################################Logic for Binary to String conversion.#################
+##########################  Logic for Binary to String conversion   ####################
 def BinarytoString(bin_data):
 # initializing a empty string for storing the string data
     str_data =' '
@@ -44,23 +44,23 @@ def TexttoBin(test_str):
 def encoding(image_name,data,m):
     i=0
     with Image.open(image_name) as img:
-        
-        
         n_bytes = img.size[0]*img.size[1] * m // 8
         print("Max possible bytes is: ",n_bytes)
         if(len(data)>n_bytes):
             raise ValueError("[!] Insufficient bytes available, need bigger image or less data.")
-            exit()
+            
         print('--------------Encoding the Image---------------------')
         #give width and height of the image
         width, height = img.size
-        print("width is", width,'\nHeight is: ', height)
-        #piccel=list(img.getpixel((0,0)))
+        print("Width is", width,'\nHeight is: ', height)
         #iterate through each and every pixel through entire image 
         for x in range(0, width):
             for y in range(0, height):
                 #get pixels of the image as a list like [R, G, B, A]
-                pixel = list(img.getpixel((x, y)))
+                if(m==1):
+                    pixel=img.getpixel((x,y))
+                else:
+                    pixel = list(img.getpixel((x, y)))
                 #iterate thorugh rgba of the current pixel
                 for n in range(0,m):
                     if(i < len(data)):
@@ -68,13 +68,19 @@ def encoding(image_name,data,m):
                         #10 since pixel[1] is 10 and then 10 ands with 0 means the LSB of for all such RGB in pixcels becomes zero
                         #then we or it with our data bits..
                         # so that whatever bit are there in our data, it goes into the lsb of the pixel's R, G, B
-                        pixel[n] = pixel[n] & ~1 | int(data[i])
+                        if(m==1):
+                            pixel=pixel& ~1 | int(data[i])
+                        else:
+                            pixel[n] = pixel[n] & ~1 | int(data[i])
                         i+=1
                 #replaces the pixel in image with edited pixel in variable pixel
                 # and since its a tuple we need to make it a tuple
-                img.putpixel((x,y), tuple(pixel))
-        #saving it as new image        
-        img.save("source_secret.png", "PNG")
+                if(m==1):
+                    img.putpixel((x,y), pixel)
+                else:
+                    img.putpixel((x,y), tuple(pixel))
+        #saving it as new image       
+        img.save('source_secret.'+str(img.format),img.format)
         print("Done: Image is encoded with the text Successfully")
  #########################   END OF ENCODING LOGIC   ########################################
 
@@ -85,13 +91,18 @@ def decoding(image_name,m):
     with Image.open(image_name) as img:
         print("--------------------Decoding the Image--------------------")
         width, height = img.size
-        ext=list(img.getpixel((0,0)))[0]    
         for x in range(0, width):
             for y in range(0, height):
-                pixel = list(img.getpixel((x, y)))
+                if(m==1):
+                    pixel = img.getpixel((x, y))
+                else:
+                    pixel = list(img.getpixel((x, y)))
                 
                 for n in range(0,m):
-                    pixbin=str(bin(pixel[n]&1))
+                    if(m==1):
+                        pixbin=str(bin(pixel & 1))
+                    else:
+                        pixbin=str(bin(pixel[n]&1))
                     extracted_bin.append(pixbin[-1])
 
     data = "".join([str(x) for x in extracted_bin])
@@ -100,53 +111,13 @@ def decoding(image_name,m):
 
 ########################  END OF DECODING LOGIC    ####################################
 
-###################### black and white encode logic #############
-def encodingblackandwhite(image_name,data,m):
-    i=0
-    with Image.open(image_name) as img:
-        n_bytes = img.size[0]*img.size[1] * m // 8
-        print("Max possible bytes is: ",n_bytes)
-        if(len(data)>n_bytes):
-            raise ValueError("[!] Insufficient bytes available, need bigger image or less data.")
-        print('--------------Encoding the Image---------------------')
-        #give width and height of the image
-        width, height = img.size
-        print("width is", width,'\nHeight is: ', height)
-        for x in range(0, width):
-            for y in range(0, height):
-                pixel = (img.getpixel((x, y)))
-                if i<len(data):
-                    pixel = pixel & ~1 | int(data[i])
-                    i+=1
-                img.putpixel((x,y),pixel)
-        #saving it as new image        
-        img.save("source_secretbw.png", "PNG")
-        print("Done: BW Image is encoded with the text Successfully")
-################################################################
-
-######################## Decode Black and White Image ########################
-def decodingblackandwhite(image_name):
-    extracted_bin = []
-    with Image.open(image_name) as img:
-        print("--------------------Decoding the Image--------------------")
-        width, height = img.size
-        for x in range(0, width):
-            for y in range(0, height):
-                pixel = img.getpixel((x, y))
-                pixbin=str(bin(pixel&1))
-                extracted_bin.append(pixbin[-1])
-    data = "".join([str(x) for x in extracted_bin])
-    decoded_data=BinarytoString(data)
-    return decoded_data
-##############################################################################
-
 
 ######################### VALIDATION FUNCTION ##################################
 def Filevalidation(input_image):
     try:
         with Image.open(input_image) as img:
             if img.format not in ('BMP','PNG','TIFF'):
-                print('Only Lossless compresssion Images are supported, Please select BMP or PNG extension Images')
+                print('Only Lossless compresssion Images are supported, Please select BMP or PNG or TIFF Images')
                 return [False,0]
             if(img.mode=='L'):
                 m=1
@@ -162,6 +133,7 @@ def Filevalidation(input_image):
     except FileNotFoundError:
         print("The File location seems invalid, Please Enter correct File Location")
         return [False,0]
+
 ########################   MAIN DRIVER FUNCTION    #########################################
 
 if __name__ == "__main__":
@@ -181,12 +153,8 @@ if __name__ == "__main__":
                 continue
             # encode the data into the image
             mode=IsValid[1]
-            if(mode==1):
-                encoded_image=encodingblackandwhite(input_image,data,mode)
-                break
-            else:
-                encoded_image = encoding(image_name=input_image,data=data,m=mode)
-                break
+            encoding(image_name=input_image,data=data,m=mode)
+            break
     
         elif (a == 2):
             # decode the secret data from the image
@@ -195,10 +163,7 @@ if __name__ == "__main__":
             if(IsValid[0]== False):
                 continue
             mode=IsValid[1]
-            if(mode==1):
-                decoded_data=decodingblackandwhite(input_image)
-            else:
-                decoded_data = decoding(input_image,mode)
+            decoded_data = decoding(input_image,mode)
             print("The decoded data is ",decoded_data)
             print("-----------------------------------")
             break
