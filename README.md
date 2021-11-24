@@ -24,7 +24,10 @@ We then use bintostring function and check for our stop criteria(used to detect 
 
 ----------------- FILEVALIDATION  ---------------------
 
-checks if the input file is image file or not. Raises error if it's not
+checks if the input file is image file or not. Raises error if it's not.
+
+checks the mode of the image file like RGB or RGBA or L and then returns an integer for iteration use in encode/decode functions.
+
 
 --------------------------------------------------------
 
