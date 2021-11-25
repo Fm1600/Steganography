@@ -1,6 +1,3 @@
-from typing import Text
-import cv2
-import numpy as np
 from PIL import Image
 from PIL import UnidentifiedImageError
 
@@ -8,16 +5,12 @@ from PIL import UnidentifiedImageError
 def BinarytoString(bin_data):
 # initializing a empty string for storing the string data
     str_data =' '
-  
 # slicing the input and converting it in decimal and then converting it in string
     for i in range(0, len(bin_data), 8):
-    # slicing the bin_data from index range [0, 6]
-    # and storing it in temp_data
         temp_data = bin_data[i:i + 8]
     # passing temp_data in BinarytoDecimal() function
     # to get decimal value of corresponding temp_data
         decimal_data = int(temp_data,2)
-      
     # Decoding the decimal value returned by int function,  using chr()
     # function which return the string corresponding character for given ASCII value, and store it
     # in str_data
@@ -100,9 +93,9 @@ def decoding(image_name,m):
                 
                 for n in range(0,m):
                     if(m==1):
-                        pixbin=str(bin(pixel & 1))
+                        pixbin=str(bin(pixel))
                     else:
-                        pixbin=str(bin(pixel[n]&1))
+                        pixbin=str(bin(pixel[n]))
                     extracted_bin.append(pixbin[-1])
 
     data = "".join([str(x) for x in extracted_bin])
